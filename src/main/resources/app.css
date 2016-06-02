@@ -1,0 +1,41 @@
+.ponto {
+    /*-fx-background-color: white;*/
+    /*-fx-border-color: black;*/
+    /*-fx-border-width: 1;*/
+    /*-fx-border-radius: 6;*/
+    /*-fx-padding: 6;*/
+}
+
+.ponto.selecionado {
+    -fx-border-color: deepskyblue;
+}
+
+/*.ponto.inicial {*/
+    /*-fx-background-color: lightgreen;*/
+/*}*/
+
+/*.ponto.final {*/
+    /*-fx-background-color: red;*/
+/*}*/
+
+.propriedades {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-padding: 6;
+}
+
+.aresta-linha {
+    -fx-stroke-width: 2px;
+    -fx-stroke: black;
+    -fx-stroke-line-cap: butt;
+}
+
+.aresta-linha.selecionada {
+    -fx-stroke: red;
+}
+
+.aresta-label {
+    -fx-text-fill: white;
+}

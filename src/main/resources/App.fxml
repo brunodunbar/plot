@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.shape.Circle?>
+
+
+<?import com.brunodunbar.plot.Plano?>
+<GridPane prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="com.brunodunbar.plot.AppController">
+
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
+    </rowConstraints>
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <children>
+        <MenuBar>
+            <menus>
+                <Menu mnemonicParsing="false" text="Arquivo">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Abrir..." onAction="#handleAbrir"/>
+                        <MenuItem mnemonicParsing="false" text="Salvar..." onAction="#handleSalvar"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Executar">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Calcular" onAction="#handleCalcular"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <Plano fx:id="plano" GridPane.rowIndex="1"/>
+    </children>
+</GridPane>
