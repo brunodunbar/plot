@@ -1,12 +1,13 @@
 package com.brunodunbar.plot;
 
-import javafx.beans.binding.DoubleBinding;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -21,24 +22,20 @@ import javafx.scene.shape.Line;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Plano extends GridPane {
 
     private double actionX, actionY;
 
     private Ponto actionPonto;
-
     private Ponto pontoSelecionado;
 
     @FXML
     private Pane planoPane;
 
     private ObservableList<Ponto> pontos = FXCollections.observableArrayList();
-    private ObservableList<Aresta> arestas = FXCollections.observableArrayList();
 
     private final ContextMenu contextMenu;
-
     private final ContextMenu noContextMenu;
 
     public Plano() {
@@ -56,12 +53,6 @@ public class Plano extends GridPane {
         pontos.addListener((ListChangeListener<Ponto>) c -> {
             while (c.next()) {
                 if (c.wasRemoved()) {
-                    //Remove as arestas dos nós que estão sendo removidos
-                    c.getRemoved().forEach(o -> {
-                        System.out.print("Removendo nó: " + o);
-                        arestas.removeAll(buscaArestas(o).collect(Collectors.toList()));
-                    });
-
                     //Remove os nós
                     List<Node> collect = c.getRemoved().stream()
                             .map(Ponto::getGroup)
@@ -79,44 +70,14 @@ public class Plano extends GridPane {
             }
         });
 
-        arestas.addListener((ListChangeListener<Aresta>) c -> {
-            while (c.next()) {
-                if (c.wasRemoved()) {
-                    planoPane.getChildren().removeAll(c.getRemoved());
-                }
-                if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(o -> o.setPlano(this));
-                    planoPane.getChildren().addAll(c.getAddedSubList());
-                }
-            }
-        });
-
-
         contextMenu = new ContextMenu();
-        MenuItem novoNo = new MenuItem("Novo Nó");
+        MenuItem novoNo = new MenuItem("Novo ponto");
         novoNo.setOnAction(e -> {
-            Ponto ponto = new Ponto();
-
-            ponto.setLayoutX(actionX);
-            ponto.setLayoutY(actionY);
-
-            //ponto.setLabel("Nó " + (pontos.size() + 1));
-
-            pontos.add(ponto);
+            addPonto(new Point2D(actionX, actionY));
         });
         contextMenu.getItems().addAll(novoNo);
 
         noContextMenu = new ContextMenu();
-
-        MenuItem criarAresta = new MenuItem("Criar aresta");
-        criarAresta.setOnAction(event -> {
-            if (pontoSelecionado != null && pontoSelecionado != actionPonto) {
-                if (!possuiAresta(pontoSelecionado, actionPonto)) {
-                    Aresta aresta = new Aresta(pontoSelecionado, actionPonto);
-                    arestas.add(aresta);
-                }
-            }
-        });
 
 //        MenuItem definirInicial = new MenuItem("Definir como nó inicial");
 //        definirInicial.setOnAction(event -> setNoInicial(actionPonto));
@@ -124,10 +85,10 @@ public class Plano extends GridPane {
 //        MenuItem definirFinal = new MenuItem("Definir como nó final");
 //        definirFinal.setOnAction(event -> setNoFinal(actionPonto));
 
-        MenuItem removerNo = new MenuItem("Remover nó");
-        removerNo.setOnAction(event -> pontos.remove(actionPonto));
+        MenuItem removerPonto = new MenuItem("Remover ponto");
+        removerPonto.setOnAction(event -> pontos.remove(actionPonto));
 
-        noContextMenu.getItems().addAll(criarAresta, removerNo);
+        noContextMenu.getItems().addAll(removerPonto);
 
         planoPane.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
@@ -162,7 +123,6 @@ public class Plano extends GridPane {
         });
 
         planoPane.getChildren().addAll(line1, line2);
-
     }
 
     private Node makeDraggable(final Ponto ponto) {
@@ -232,16 +192,6 @@ public class Plano extends GridPane {
         return wrapGroup;
     }
 
-    private boolean possuiAresta(Ponto ponto1, Ponto ponto2) {
-        return buscaAresta(ponto1, ponto2).isPresent();
-    }
-
-    private Optional<Aresta> buscaAresta(Ponto ponto1, Ponto ponto2) {
-        return arestas.stream().filter(aresta -> aresta.getDe().equals(ponto1) && aresta.getPara().equals(ponto2) ||
-                aresta.getDe().equals(ponto2) && aresta.getPara().equals(ponto1))
-                .findAny();
-    }
-
     private class Delta {
         double x, y;
     }
@@ -250,25 +200,52 @@ public class Plano extends GridPane {
         return pontos;
     }
 
-    public ObservableList<Aresta> getArestas() {
-        return arestas;
-    }
-
-    public Stream<Aresta> buscaArestas(Ponto ponto) {
-        return arestas.stream().filter(aresta -> Objects.equals(aresta.getDe(), ponto) || Objects.equals(aresta.getPara(), ponto));
-    }
-
     public void clear() {
-        arestas.clear();
         pontos.clear();
-        planoPane.getChildren().clear();
     }
 
-//    public Ponto getNoInicial() {
-//        return noInicial;
-//    }
-//
-//    public Ponto getNoFinal() {
-//        return noFinal;
-//    }
+    public void addPonto(Double x, Double y) {
+        addPonto(translate(x, y));
+    }
+
+    public void addPonto(Point2D point) {
+        Ponto ponto = new Ponto(Plano.this);
+
+        ponto.setLayoutX(point.getX());
+        ponto.setLayoutY(point.getY());
+
+        pontos.add(ponto);
+
+        Platform.runLater(() -> {
+            ponto.setLayoutX(point.getX() - ponto.getOffsetX());
+            ponto.setLayoutY(point.getY() - ponto.getOffsetY());
+        });
+
+    }
+
+    public Point2D translate(Double x, Double y) {
+
+        double centerY = getHeight() / 2;
+        double centerX = getWidth() / 2;
+
+        double transX = centerX + x * (centerX / 10);
+        double transY = centerY - y * (centerY / 10);
+
+
+        return new Point2D(transX, transY);
+    }
+
+    public Point2D translate(Ponto ponto) {
+
+        double centerY = getHeight() / 2;
+        double centerX = getWidth() / 2;
+
+        double x = ponto.getLayoutX() + ponto.getOffsetX();
+        double y = ponto.getLayoutY() + ponto.getOffsetY();
+
+        double transX = (x - centerX) / (centerX / 10);
+        double transY = (centerY - y) / (centerY / 10);
+
+        return new Point2D(transX, transY);
+    }
 }

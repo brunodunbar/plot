@@ -27,9 +27,9 @@
                         <MenuItem mnemonicParsing="false" text="Salvar..." onAction="#handleSalvar"/>
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Executar">
+                <Menu mnemonicParsing="false" text="Inserir">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Calcular" onAction="#handleCalcular"/>
+                        <MenuItem mnemonicParsing="false" text="Ponto" onAction="#handleInserirPonto"/>
                     </items>
                 </Menu>
             </menus>

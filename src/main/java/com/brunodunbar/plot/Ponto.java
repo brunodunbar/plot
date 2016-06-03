@@ -6,6 +6,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
@@ -16,27 +17,40 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public class Ponto extends VBox {
 
-    private Label label;
     private final BooleanProperty selecionado = new SimpleBooleanProperty();
+
+
+    private final Label label;
+    private final Plano plano;
+    private final Circle circle;
 
     private Group group;
 
-    public Ponto() {
+
+    public Ponto(Plano plano) {
+        this.plano = plano;
 
         setAlignment(Pos.CENTER);
 
         label = new Label();
         getChildren().add(label);
 
-        Circle circle = new Circle();
+        circle = new Circle();
         getChildren().add(circle);
         circle.setRadius(5);
 
         InvalidationListener updateLabel = observable1 -> {
-            label.setText(getLayoutX() + ", " + getLayoutY());
+
+            Point2D translate = plano.translate(this);
+
+            BigDecimal x = BigDecimal.valueOf(translate.getX()).setScale(2, BigDecimal.ROUND_DOWN);
+            BigDecimal y = BigDecimal.valueOf(translate.getY()).setScale(2, BigDecimal.ROUND_DOWN);
+
+            label.setText(x + ", " + y);
         };
 
         layoutXProperty().addListener(updateLabel);
@@ -52,6 +66,15 @@ public class Ponto extends VBox {
                 getStyleClass().remove("selecionado");
             }
         });
+    }
+
+
+    public double getOffsetX() {
+        return (circle.getLayoutX() + circle.getCenterX());
+    }
+
+    public double getOffsetY() {
+        return (circle.getLayoutY() + circle.getCenterY());
     }
 
     public void setLabel(String value) {

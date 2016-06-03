@@ -2,15 +2,24 @@ package com.brunodunbar.plot;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 
 public class AppController {
 
@@ -24,17 +33,50 @@ public class AppController {
 
     }
 
-    public void handleCalcular(ActionEvent actionEvent) {
-//        try {
-//            floydWarshall.calcular();
-//        } catch (IllegalStateException e) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Falha ao calcular caminho");
-//            alert.setHeaderText(null);
-//            alert.setContentText(e.getMessage());
-//
-//            alert.showAndWait();
-//        }
+    public void handleInserirPonto(ActionEvent actionEvent) {
+
+        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.setTitle("Inserir ponto");
+        dialog.setHeaderText("Informe as coordenadas do ponto");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField xTextField = new TextField();
+        xTextField.setPromptText("Coordenada X");
+//        xTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            if (!newValue.matches("\\d*")) {
+//                xTextField.setText(newValue.replaceAll("[^\\d]", ""));
+//            }
+//        });
+
+        TextField yTextField = new TextField();
+        yTextField.setPromptText("Coordenada Y");
+
+        grid.add(new Label("Coordenada X:"), 0, 0);
+        grid.add(xTextField, 1, 0);
+        grid.add(new Label("Coordenada Y:"), 0, 1);
+        grid.add(yTextField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Platform.runLater(xTextField::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
+            }
+            return null;
+        });
+
+        Optional<Pair<Double, Double>> result = dialog.showAndWait();
+        result.ifPresent(pair -> {
+            plano.addPonto(pair.getKey(), pair.getValue());
+        });
     }
 
     public void handleAbrir(ActionEvent actionEvent) {
@@ -50,105 +92,51 @@ public class AppController {
         if (file != null && file.exists()) {
             try (JsonReader reader = new JsonReader(new FileReader(file))) {
 
-//                plano.clear();
-//
-//                reader.beginObject();
-//
-//                while (reader.hasNext()) {
-//
-//                    switch (reader.nextName()) {
-//                        case "nos":
-//
-//                            reader.beginArray();
-//
-//                            while (reader.hasNext()) {
-//
-//                                reader.beginObject();
-//
-//                                Ponto no = new Ponto();
-//
-//                                boolean noFinal = false, noInicial = false;
-//
-//                                while (reader.hasNext()) {
-//                                    switch (reader.nextName()) {
-//                                        case "label":
-//                                            no.setLabel(reader.nextString());
-//                                            break;
-//                                        case "x":
-//                                            no.setLayoutX(reader.nextDouble());
-//                                            break;
-//                                        case "y":
-//                                            no.setLayoutY(reader.nextDouble());
-//                                            break;
-//                                        case "inicial":
-//                                            noInicial = reader.nextBoolean();
-//                                            break;
-//                                        case "final":
-//                                            noFinal = reader.nextBoolean();
-//                                            break;
-//                                        default:
-//                                            reader.skipValue();
-//                                    }
-//                                }
-//
-//                                plano.getPontos().add(no);
-//
-//                                if (noInicial) {
-//                                    plano.setNoInicial(no);
-//                                }
-//
-//                                if (noFinal) {
-//                                    plano.setNoFinal(no);
-//                                }
-//
-//                                reader.endObject();
-//                            }
-//
-//                            reader.endArray();
-//
-//                            break;
-//                        case "arestas":
-//
-//                            reader.beginArray();
-//
-//                            while (reader.hasNext()) {
-//
-//                                reader.beginObject();
-//
-//                                Ponto de = null, para = null;
-//                                int distancia = 0;
-//
-//                                while (reader.hasNext()) {
-//                                    switch (reader.nextName()) {
-//                                        case "de":
-//                                            de = plano.buscaNoPorLabel(reader.nextString());
-//                                            break;
-//                                        case "para":
-//                                            para = plano.buscaNoPorLabel(reader.nextString());
-//                                            break;
-//                                        case "distancia":
-//                                            distancia = reader.nextInt();
-//                                            break;
-//                                        default:
-//                                            reader.skipValue();
-//                                    }
-//                                }
-//
-//                                Aresta aresta = new Aresta(de, para);
-//                                aresta.setDistancia(distancia);
-//
-//                                plano.getArestas().add(aresta);
-//
-//                                reader.endObject();
-//                            }
-//                            reader.endArray();
-//                            break;
-//                        default:
-//                            reader.skipValue();
-//                    }
-//                }
-//
-//                reader.endObject();
+                plano.clear();
+
+                reader.beginObject();
+
+                while (reader.hasNext()) {
+
+                    switch (reader.nextName()) {
+                        case "pontos":
+
+                            reader.beginArray();
+
+                            while (reader.hasNext()) {
+
+                                reader.beginObject();
+
+                                double x = 0, y = 0;
+
+                                while (reader.hasNext()) {
+                                    switch (reader.nextName()) {
+                                        case "x":
+                                            x = reader.nextDouble();
+                                            break;
+                                        case "y":
+                                            y = reader.nextDouble();
+                                            break;
+                                        default:
+                                            reader.skipValue();
+                                    }
+                                }
+
+                                plano.addPonto(x, y);
+
+                                reader.endObject();
+                            }
+
+                            reader.endArray();
+
+                            break;
+
+                        default:
+                            reader.skipValue();
+                    }
+                }
+
+                reader.endObject();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -167,48 +155,26 @@ public class AppController {
         if (file != null) {
 
             try (JsonWriter writer = new JsonWriter(new FileWriter(file))) {
-//                writer.setIndent("  ");
-//                writer.beginObject();
-//                writer.name("nos");
-//
-//                writer.beginArray();
-//
-//                for (Ponto no : plano.getPontos()) {
-//
-//                    writer.beginObject();
-//
-//                    writer.name("label").value(no.getLabel());
-//                    writer.name("x").value(no.getLayoutX());
-//                    writer.name("y").value(no.getLayoutY());
-//
-//                    if (no.getInicial()) {
-//                        writer.name("inicial").value(no.getInicial());
-//                    }
-//
-//                    if (no.getFinal()) {
-//                        writer.name("final").value(no.getFinal());
-//                    }
-//
-//                    writer.endObject();
-//
-//                }
-//                writer.endArray();
-//
-//                writer.name("arestas");
-//                writer.beginArray();
-//                for (Aresta aresta : plano.getArestas()) {
-//
-//                    writer.beginObject();
-//
-//                    writer.name("de").value(aresta.getDe().getLabel());
-//                    writer.name("para").value(aresta.getPara().getLabel());
-//                    writer.name("distancia").value(aresta.getLabel());
-//
-//                    writer.endObject();
-//                }
-//                writer.endArray();
-//
-//                writer.endObject();
+                writer.setIndent("  ");
+                writer.beginObject();
+                writer.name("pontos");
+
+                writer.beginArray();
+
+                for (Ponto ponto : plano.getPontos()) {
+
+                    writer.beginObject();
+
+                    Point2D point = plano.translate(ponto);
+
+                    writer.name("x").value(point.getX());
+                    writer.name("y").value(point.getY());
+
+                    writer.endObject();
+                }
+
+                writer.endArray();
+                writer.endObject();
 
                 writer.flush();
             } catch (IOException e) {
