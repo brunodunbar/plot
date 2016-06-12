@@ -29,9 +29,18 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Inserir">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Ponto" onAction="#handleInserirPonto"/>
+                        <MenuItem mnemonicParsing="false" text="Ponto coordenada cartesiana" onAction="#handleInserirPontoCartesiana"/>
+                        <MenuItem mnemonicParsing="false" text="Ponto coordenada polar" onAction="#handleInserirPontoPolar"/>
                     </items>
                 </Menu>
+                <Menu mnemonicParsing="false" text="Ações">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Mover para" onAction="#handleMoverPontoCartesiana"/>
+                        <MenuItem mnemonicParsing="false" text="Escalonar" onAction="#handleEscalonarPonto"/>
+                        <MenuItem mnemonicParsing="false" text="Rotacionar" onAction="#handleRotacionarPonto"/>
+                    </items>
+                </Menu>
+
             </menus>
         </MenuBar>
         <Plano fx:id="plano" GridPane.rowIndex="1"/>

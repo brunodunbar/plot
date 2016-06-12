@@ -23,7 +23,6 @@ public class Ponto extends VBox {
 
     private final BooleanProperty selecionado = new SimpleBooleanProperty();
 
-
     private final Label label;
     private final Plano plano;
     private final Circle circle;
@@ -31,13 +30,15 @@ public class Ponto extends VBox {
     private Group group;
 
 
+    private Point2D position;
+
     public Ponto(Plano plano) {
         this.plano = plano;
 
         setAlignment(Pos.CENTER);
 
         label = new Label();
-        getChildren().add(label);
+//        getChildren().add(label);
 
         circle = new Circle();
         getChildren().add(circle);
@@ -49,6 +50,9 @@ public class Ponto extends VBox {
 
             BigDecimal x = BigDecimal.valueOf(translate.getX()).setScale(2, BigDecimal.ROUND_DOWN);
             BigDecimal y = BigDecimal.valueOf(translate.getY()).setScale(2, BigDecimal.ROUND_DOWN);
+
+
+            position = new Point2D(x.doubleValue(), y.doubleValue());
 
             label.setText(x + ", " + y);
         };
@@ -69,12 +73,16 @@ public class Ponto extends VBox {
     }
 
 
+    public Point2D getPosition() {
+        return position;
+    }
+
     public double getOffsetX() {
-        return (circle.getLayoutX() + circle.getCenterX());
+        return 5;
     }
 
     public double getOffsetY() {
-        return (circle.getLayoutY() + circle.getCenterY());
+        return 5;
     }
 
     public void setLabel(String value) {

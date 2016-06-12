@@ -20,6 +20,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +75,7 @@ public class Plano extends GridPane {
         contextMenu = new ContextMenu();
         MenuItem novoNo = new MenuItem("Novo ponto");
         novoNo.setOnAction(e -> {
-            addPonto(new Point2D(actionX, actionY));
+            addPontoCartesiana(new Point2D(actionX, actionY));
         });
         contextMenu.getItems().addAll(novoNo);
 
@@ -192,6 +194,52 @@ public class Plano extends GridPane {
         return wrapGroup;
     }
 
+    public void addPontoPolar(Double angulo, Double raio) {
+        addPontoCartesiana(raio * Math.cos(Math.toRadians(angulo)), raio * Math.sin(Math.toRadians(angulo)));
+    }
+
+    public void moverPontoCartesiana(Double x, Double y) {
+
+        Point2D translate = translate(x, y);
+
+        if (pontoSelecionado != null) {
+            pontoSelecionado.setLayoutX(translate.getX() - pontoSelecionado.getOffsetX());
+            pontoSelecionado.setLayoutY(translate.getY() - pontoSelecionado.getOffsetY());
+        }
+    }
+
+    public void escalonarPonto(Double percX, Double percY) {
+
+        if (pontoSelecionado != null) {
+
+            Point2D position = pontoSelecionado.getPosition();
+
+            Point2D translate = translate(position.getX() * percX / 100, position.getY() * percY / 100);
+
+            pontoSelecionado.setLayoutX(translate.getX() - pontoSelecionado.getOffsetX());
+            pontoSelecionado.setLayoutY(translate.getY() - pontoSelecionado.getOffsetY());
+        }
+    }
+
+    public void rotacionarPonto(Double angulo) {
+
+        if (pontoSelecionado != null) {
+
+
+            Point2D position = pontoSelecionado.getPosition();
+
+            double radians = Math.toRadians(angulo);
+
+            Point2D translate = translate(position.getX() * Math.cos(radians) - position.getY() * Math.sin(radians),
+                    position.getY() * Math.cos(radians) + position.getX() * Math.sin(radians));
+
+            pontoSelecionado.setLayoutX(translate.getX() - pontoSelecionado.getOffsetX());
+            pontoSelecionado.setLayoutY(translate.getY() - pontoSelecionado.getOffsetY());
+        }
+
+
+    }
+
     private class Delta {
         double x, y;
     }
@@ -204,11 +252,11 @@ public class Plano extends GridPane {
         pontos.clear();
     }
 
-    public void addPonto(Double x, Double y) {
-        addPonto(translate(x, y));
+    public void addPontoCartesiana(Double x, Double y) {
+        addPontoCartesiana(translate(x, y));
     }
 
-    public void addPonto(Point2D point) {
+    public void addPontoCartesiana(Point2D point) {
         Ponto ponto = new Ponto(Plano.this);
 
         ponto.setLayoutX(point.getX());

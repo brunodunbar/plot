@@ -3,13 +3,10 @@ package com.brunodunbar.plot;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -33,7 +30,7 @@ public class AppController {
 
     }
 
-    public void handleInserirPonto(ActionEvent actionEvent) {
+    public void handleInserirPontoCartesiana(ActionEvent actionEvent) {
 
         Dialog<Pair<Double, Double>> dialog = new Dialog<>();
 
@@ -41,7 +38,7 @@ public class AppController {
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
         dialog.setTitle("Inserir ponto");
-        dialog.setHeaderText("Informe as coordenadas do ponto");
+        dialog.setHeaderText("Informe as coordenadas cartesianas do ponto");
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -49,11 +46,6 @@ public class AppController {
 
         TextField xTextField = new TextField();
         xTextField.setPromptText("Coordenada X");
-//        xTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!newValue.matches("\\d*")) {
-//                xTextField.setText(newValue.replaceAll("[^\\d]", ""));
-//            }
-//        });
 
         TextField yTextField = new TextField();
         yTextField.setPromptText("Coordenada Y");
@@ -75,8 +67,169 @@ public class AppController {
 
         Optional<Pair<Double, Double>> result = dialog.showAndWait();
         result.ifPresent(pair -> {
-            plano.addPonto(pair.getKey(), pair.getValue());
+            plano.addPontoCartesiana(pair.getKey(), pair.getValue());
         });
+    }
+
+    public void handleInserirPontoPolar(ActionEvent actionEvent) {
+
+        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.setTitle("Inserir ponto");
+        dialog.setHeaderText("Informe as coordenadas polares do ponto");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField xTextField = new TextField();
+        xTextField.setPromptText("Angulo");
+
+        TextField yTextField = new TextField();
+        yTextField.setPromptText("Rario");
+
+        grid.add(new Label("Angulo:"), 0, 0);
+        grid.add(xTextField, 1, 0);
+        grid.add(new Label("Raio:"), 0, 1);
+        grid.add(yTextField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Platform.runLater(xTextField::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
+            }
+            return null;
+        });
+
+        Optional<Pair<Double, Double>> result = dialog.showAndWait();
+        result.ifPresent(pair -> {
+            plano.addPontoPolar(pair.getKey(), pair.getValue());
+        });
+
+    }
+
+    public void handleMoverPontoCartesiana(ActionEvent actionEvent) {
+        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.setTitle("Mover ponto");
+        dialog.setHeaderText("Informe as novas coordenadas cartesianas do ponto");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField xTextField = new TextField();
+        xTextField.setPromptText("Coordenada X");
+
+        TextField yTextField = new TextField();
+        yTextField.setPromptText("Coordenada Y");
+
+        grid.add(new Label("Coordenada X:"), 0, 0);
+        grid.add(xTextField, 1, 0);
+        grid.add(new Label("Coordenada Y:"), 0, 1);
+        grid.add(yTextField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Platform.runLater(xTextField::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
+            }
+            return null;
+        });
+
+        Optional<Pair<Double, Double>> result = dialog.showAndWait();
+        result.ifPresent(pair -> {
+            plano.moverPontoCartesiana(pair.getKey(), pair.getValue());
+        });
+    }
+
+    public void handleEscalonarPonto(ActionEvent actionEvent) {
+
+        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.setTitle("Escalonar ponto");
+        dialog.setHeaderText("Informe as porcentagens para escalonar");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField xTextField = new TextField();
+        xTextField.setPromptText("porcentagem para X");
+
+        TextField yTextField = new TextField();
+        yTextField.setPromptText("porcentagem para Y");
+
+        grid.add(new Label("X:"), 0, 0);
+        grid.add(xTextField, 1, 0);
+        grid.add(new Label("Y:"), 0, 1);
+        grid.add(yTextField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Platform.runLater(xTextField::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
+            }
+            return null;
+        });
+
+        Optional<Pair<Double, Double>> result = dialog.showAndWait();
+        result.ifPresent(pair -> {
+            plano.escalonarPonto(pair.getKey(), pair.getValue());
+        });
+    }
+
+    public void handleRotacionarPonto(ActionEvent actionEvent) {
+
+        Dialog<Double> dialog = new Dialog<>();
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.setTitle("Rotacionar ponto");
+        dialog.setHeaderText("Informe o angulo para rotacionar");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField xTextField = new TextField();
+        xTextField.setPromptText("angulo");
+
+        grid.add(new Label("Angulo:"), 0, 0);
+        grid.add(xTextField, 1, 0);
+
+        dialog.getDialogPane().setContent(grid);
+        Platform.runLater(xTextField::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return Double.valueOf(xTextField.getText());
+            }
+            return null;
+        });
+
+        Optional<Double> result = dialog.showAndWait();
+        result.ifPresent(angulo -> {
+            plano.rotacionarPonto(angulo);
+        });
+
+
     }
 
     public void handleAbrir(ActionEvent actionEvent) {
@@ -122,7 +275,7 @@ public class AppController {
                                     }
                                 }
 
-                                plano.addPonto(x, y);
+                                plano.addPontoCartesiana(x, y);
 
                                 reader.endObject();
                             }
