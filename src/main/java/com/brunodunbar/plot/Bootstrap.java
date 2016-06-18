@@ -18,7 +18,7 @@ public class Bootstrap extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         Parent root = FXMLLoader.load(getClass().getResource("/App.fxml"));
-        Scene scene = new Scene(root, 500, 500);
+        Scene scene = new Scene(root, 900, 500);
         scene.getStylesheets().add("/app.css");
 
         primaryStage.setScene(scene);

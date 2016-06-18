@@ -3,11 +3,14 @@ package com.brunodunbar.plot;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
@@ -22,138 +25,65 @@ public class AppController {
 
     @FXML
     private Plano plano;
+
+    @FXML
+    private TableView<Objeto> objetosTable;
+
     private FileChooser salvarFileChooser;
     private FileChooser abrirFileChooser;
+
+    private ObjectProperty<Objeto> objetoSelecionado = new SimpleObjectProperty<>();
 
     @FXML
     public void initialize() {
 
-    }
+        TableColumn descricaoCol = new TableColumn("Descrição");
+        descricaoCol.setCellValueFactory(new PropertyValueFactory<>("descricao"));
 
-    public void handleInserirPontoCartesiana(ActionEvent actionEvent) {
+        TableColumn coordenadaCol = new TableColumn("Coordenada");
+        coordenadaCol.setPrefWidth(100);
+        coordenadaCol.setCellValueFactory(new PropertyValueFactory<>("coordenada"));
 
-        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+        objetosTable.getColumns().addAll(descricaoCol, coordenadaCol);
+        objetosTable.setItems(plano.getObjetos());
 
-        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        objetosTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            objetoSelecionado.setValue(newValue);
+        });
 
-        dialog.setTitle("Inserir ponto");
-        dialog.setHeaderText("Informe as coordenadas cartesianas do ponto");
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField xTextField = new TextField();
-        xTextField.setPromptText("Coordenada X");
-
-        TextField yTextField = new TextField();
-        yTextField.setPromptText("Coordenada Y");
-
-        grid.add(new Label("Coordenada X:"), 0, 0);
-        grid.add(xTextField, 1, 0);
-        grid.add(new Label("Coordenada Y:"), 0, 1);
-        grid.add(yTextField, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Platform.runLater(xTextField::requestFocus);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButtonType) {
-                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
+        objetoSelecionado.addListener((observable, oldValue, newValue) -> {
+            plano.getObjetos().forEach(objeto -> objeto.setSelecionado(false));
+            if (newValue != null) {
+                newValue.setSelecionado(true);
             }
-            return null;
-        });
-
-        Optional<Pair<Double, Double>> result = dialog.showAndWait();
-        result.ifPresent(pair -> {
-            plano.addPontoCartesiana(pair.getKey(), pair.getValue());
         });
     }
 
-    public void handleInserirPontoPolar(ActionEvent actionEvent) {
+    public void handleInserirCartesiana(ActionEvent actionEvent) {
 
-        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
-
-        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-
-        dialog.setTitle("Inserir ponto");
-        dialog.setHeaderText("Informe as coordenadas polares do ponto");
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField xTextField = new TextField();
-        xTextField.setPromptText("Angulo");
-
-        TextField yTextField = new TextField();
-        yTextField.setPromptText("Rario");
-
-        grid.add(new Label("Angulo:"), 0, 0);
-        grid.add(xTextField, 1, 0);
-        grid.add(new Label("Raio:"), 0, 1);
-        grid.add(yTextField, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Platform.runLater(xTextField::requestFocus);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButtonType) {
-                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
-            }
-            return null;
-        });
-
-        Optional<Pair<Double, Double>> result = dialog.showAndWait();
-        result.ifPresent(pair -> {
-            plano.addPontoPolar(pair.getKey(), pair.getValue());
-        });
-
+        new CoordenadaCartesianaDialog().showAndWait()
+                .ifPresent(coordenadaCartesiana -> plano.add(new Ponto(coordenadaCartesiana)));
     }
 
-    public void handleMoverPontoCartesiana(ActionEvent actionEvent) {
-        Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+    public void handleInserirPolar(ActionEvent actionEvent) {
 
-        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-        dialog.setTitle("Mover ponto");
-        dialog.setHeaderText("Informe as novas coordenadas cartesianas do ponto");
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField xTextField = new TextField();
-        xTextField.setPromptText("Coordenada X");
-
-        TextField yTextField = new TextField();
-        yTextField.setPromptText("Coordenada Y");
-
-        grid.add(new Label("Coordenada X:"), 0, 0);
-        grid.add(xTextField, 1, 0);
-        grid.add(new Label("Coordenada Y:"), 0, 1);
-        grid.add(yTextField, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Platform.runLater(xTextField::requestFocus);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButtonType) {
-                return new Pair<>(Double.valueOf(xTextField.getText()), Double.valueOf(yTextField.getText()));
-            }
-            return null;
-        });
-
-        Optional<Pair<Double, Double>> result = dialog.showAndWait();
-        result.ifPresent(pair -> {
-            plano.moverPontoCartesiana(pair.getKey(), pair.getValue());
-        });
+        new CoordenadaPolarDialog().showAndWait()
+                .ifPresent(coordenadaCartesiana -> plano.add(new Ponto(coordenadaCartesiana)));
     }
 
-    public void handleEscalonarPonto(ActionEvent actionEvent) {
+    public void handleMoverCartesiana(ActionEvent actionEvent) {
+
+        if (objetoSelecionado.get() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Selecione um objeto").show();
+            return;
+        }
+
+        new CoordenadaCartesianaDialog().showAndWait()
+                .ifPresent(coordenadaCartesiana -> objetoSelecionado.get().setCoordenada(coordenadaCartesiana));
+    }
+
+    public void handleEscalonar(ActionEvent actionEvent) {
 
         Dialog<Pair<Double, Double>> dialog = new Dialog<>();
 
@@ -190,46 +120,21 @@ public class AppController {
 
         Optional<Pair<Double, Double>> result = dialog.showAndWait();
         result.ifPresent(pair -> {
-            plano.escalonarPonto(pair.getKey(), pair.getValue());
+            //   plano.escalonarPonto(pair.getKey(), pair.getValue());
         });
     }
 
-    public void handleRotacionarPonto(ActionEvent actionEvent) {
+    public void handleRotacionar(ActionEvent actionEvent) {
 
-        Dialog<Double> dialog = new Dialog<>();
+        if (objetoSelecionado.get() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Selecione um objeto").show();
+            return;
+        }
 
-        ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-
-        dialog.setTitle("Rotacionar ponto");
-        dialog.setHeaderText("Informe o angulo para rotacionar");
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField xTextField = new TextField();
-        xTextField.setPromptText("angulo");
-
-        grid.add(new Label("Angulo:"), 0, 0);
-        grid.add(xTextField, 1, 0);
-
-        dialog.getDialogPane().setContent(grid);
-        Platform.runLater(xTextField::requestFocus);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == okButtonType) {
-                return Double.valueOf(xTextField.getText());
-            }
-            return null;
+        new AnguloDialog().showAndWait().ifPresent(angle -> {
+            Coordenada coordenada = objetoSelecionado.get().getCoordenada();
+            objetoSelecionado.get().setCoordenada(coordenada.rotate(angle));
         });
-
-        Optional<Double> result = dialog.showAndWait();
-        result.ifPresent(angulo -> {
-            plano.rotacionarPonto(angulo);
-        });
-
-
     }
 
     public void handleAbrir(ActionEvent actionEvent) {
@@ -275,7 +180,7 @@ public class AppController {
                                     }
                                 }
 
-                                plano.addPontoCartesiana(x, y);
+                                plano.add(new Ponto(CoordenadaCartesiana.of(x, y)));
 
                                 reader.endObject();
                             }
@@ -314,14 +219,14 @@ public class AppController {
 
                 writer.beginArray();
 
-                for (Ponto ponto : plano.getPontos()) {
+                for (Objeto objeto : plano.getObjetos()) {
 
                     writer.beginObject();
 
-                    Point2D point = plano.translate(ponto);
+                    CoordenadaCartesiana coordenada = objeto.getCoordenada().asCartesiana();
 
-                    writer.name("x").value(point.getX());
-                    writer.name("y").value(point.getY());
+                    writer.name("x").value(coordenada.getX());
+                    writer.name("y").value(coordenada.getY());
 
                     writer.endObject();
                 }

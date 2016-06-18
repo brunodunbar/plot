@@ -19,7 +19,7 @@
         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
     </columnConstraints>
     <children>
-        <MenuBar>
+        <MenuBar GridPane.columnSpan="2">
             <menus>
                 <Menu mnemonicParsing="false" text="Arquivo">
                     <items>
@@ -29,20 +29,21 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Inserir">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Ponto coordenada cartesiana" onAction="#handleInserirPontoCartesiana"/>
-                        <MenuItem mnemonicParsing="false" text="Ponto coordenada polar" onAction="#handleInserirPontoPolar"/>
+                        <MenuItem mnemonicParsing="false" text="Cartesiana" onAction="#handleInserirCartesiana"/>
+                        <MenuItem mnemonicParsing="false" text="Polar" onAction="#handleInserirPolar"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ações">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Mover para" onAction="#handleMoverPontoCartesiana"/>
-                        <MenuItem mnemonicParsing="false" text="Escalonar" onAction="#handleEscalonarPonto"/>
-                        <MenuItem mnemonicParsing="false" text="Rotacionar" onAction="#handleRotacionarPonto"/>
+                        <MenuItem mnemonicParsing="false" text="Mover para" onAction="#handleMoverCartesiana"/>
+                        <MenuItem mnemonicParsing="false" text="Escalonar" onAction="#handleEscalonar"/>
+                        <MenuItem mnemonicParsing="false" text="Rotacionar" onAction="#handleRotacionar"/>
                     </items>
                 </Menu>
 
             </menus>
         </MenuBar>
-        <Plano fx:id="plano" GridPane.rowIndex="1"/>
+        <TableView fx:id="objetosTable" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Plano fx:id="plano" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
     </children>
 </GridPane>

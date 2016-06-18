@@ -6,16 +6,16 @@
     /*-fx-padding: 6;*/
 }
 
-.ponto.selecionado {
-    -fx-border-color: deepskyblue;
+.ponto.selecionado Circle {
+    -fx-fill: deepskyblue;
 }
 
 /*.ponto.inicial {*/
-    /*-fx-background-color: lightgreen;*/
+/*-fx-background-color: lightgreen;*/
 /*}*/
 
 /*.ponto.final {*/
-    /*-fx-background-color: red;*/
+/*-fx-background-color: red;*/
 /*}*/
 
 .propriedades {
