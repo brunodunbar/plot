@@ -35,8 +35,15 @@
                         <MenuItem mnemonicParsing="false" text="Escalonar" onAction="#handleEscalonar"/>
                         <MenuItem mnemonicParsing="false" text="Rotacionar" onAction="#handleRotacionar"/>
                         <SeparatorMenuItem/>
-                        <MenuItem mnemonicParsing="false" text="Distancia aeroporto" onAction="#handleDistanciaAeroporto"/>
+                        <MenuItem mnemonicParsing="false" text="Distancia aeroporto"
+                                  onAction="#handleDistanciaAeroporto"/>
                         <MenuItem mnemonicParsing="false" text="Distancia aviões" onAction="#handleDistanciaAvioes"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Calculo">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Configurações" onAction="#handleConfiguracoes" />
+                        <SeparatorMenuItem />
                     </items>
                 </Menu>
             </menus>

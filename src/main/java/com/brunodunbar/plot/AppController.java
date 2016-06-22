@@ -33,6 +33,8 @@ public class AppController {
 
     private ObjectProperty<Aviao> aviaoSelecionado = new SimpleObjectProperty<>();
 
+    private Configuracao configuracao = new Configuracao();
+
     @FXML
     public void initialize() {
 
@@ -156,6 +158,10 @@ public class AppController {
             Coordenada coordenada = aviaoSelecionado.get().getCoordenada();
             aviaoSelecionado.get().setCoordenada(coordenada.rotate(angle));
         });
+    }
+
+    public void handleConfiguracoes(ActionEvent actionEvent) {
+        new ConfiguracaoDialog(configuracao).showAndWait();
     }
 
     public void handleAbrir(ActionEvent actionEvent) {
