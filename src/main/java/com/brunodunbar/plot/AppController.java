@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
@@ -27,12 +26,12 @@ public class AppController {
     private Plano plano;
 
     @FXML
-    private TableView<Objeto> objetosTable;
+    private TableView<Aviao> objetosTable;
 
     private FileChooser salvarFileChooser;
     private FileChooser abrirFileChooser;
 
-    private ObjectProperty<Objeto> objetoSelecionado = new SimpleObjectProperty<>();
+    private ObjectProperty<Aviao> aviaoSelecionado = new SimpleObjectProperty<>();
 
     @FXML
     public void initialize() {
@@ -44,43 +43,65 @@ public class AppController {
         coordenadaCol.setPrefWidth(100);
         coordenadaCol.setCellValueFactory(new PropertyValueFactory<>("coordenada"));
 
-        objetosTable.getColumns().addAll(descricaoCol, coordenadaCol);
-        objetosTable.setItems(plano.getObjetos());
+        TableColumn direcaoCol = new TableColumn("Direção");
+        direcaoCol.setPrefWidth(100);
+        direcaoCol.setCellValueFactory(new PropertyValueFactory<>("direcao"));
+
+        TableColumn velocidadeCol = new TableColumn("Velocidade");
+        velocidadeCol.setPrefWidth(100);
+        velocidadeCol.setCellValueFactory(new PropertyValueFactory<>("velocidade"));
+
+        objetosTable.getColumns().addAll(descricaoCol, coordenadaCol, direcaoCol, velocidadeCol);
+        objetosTable.setItems(plano.getAvioes());
 
         objetosTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            objetoSelecionado.setValue(newValue);
+            aviaoSelecionado.setValue(newValue);
         });
 
-        objetoSelecionado.addListener((observable, oldValue, newValue) -> {
-            plano.getObjetos().forEach(objeto -> objeto.setSelecionado(false));
+        aviaoSelecionado.addListener((observable, oldValue, newValue) -> {
+            plano.getAvioes().forEach(objeto -> objeto.setSelecionado(false));
             if (newValue != null) {
                 newValue.setSelecionado(true);
             }
         });
     }
 
-    public void handleInserirCartesiana(ActionEvent actionEvent) {
-
-        new CoordenadaCartesianaDialog().showAndWait()
-                .ifPresent(coordenadaCartesiana -> plano.add(new Ponto(coordenadaCartesiana)));
+    public void handleAddAviao(ActionEvent actionEvent) {
+        new AviaoDialog(new Aviao()).showAndWait()
+                .ifPresent(aviao -> plano.add(aviao));
     }
 
-    public void handleInserirPolar(ActionEvent actionEvent) {
-
-
-        new CoordenadaPolarDialog().showAndWait()
-                .ifPresent(coordenadaCartesiana -> plano.add(new Ponto(coordenadaCartesiana)));
-    }
-
-    public void handleMoverCartesiana(ActionEvent actionEvent) {
-
-        if (objetoSelecionado.get() == null) {
-            new Alert(Alert.AlertType.INFORMATION, "Selecione um objeto").show();
+    public void handleEditAviao(ActionEvent actionEvent) {
+        if (aviaoSelecionado.get() == null) {
+            new Alert(Alert.AlertType.INFORMATION, "Selecione um avião").show();
             return;
         }
 
-        new CoordenadaCartesianaDialog().showAndWait()
-                .ifPresent(coordenadaCartesiana -> objetoSelecionado.get().setCoordenada(coordenadaCartesiana));
+        new AviaoDialog(aviaoSelecionado.get()).show();
+    }
+
+
+    public void handleDistanciaAeroporto(ActionEvent actionEvent) {
+        for (Aviao aviao : plano.getAvioes()) {
+            System.out.println("Avião: " + aviao.getDescricao() + " " + aviao.getCoordenada().asCartesiana().distance());
+        }
+    }
+
+    public void handleDistanciaAvioes(ActionEvent actionEvent) {
+
+        for (int i = 0; i < plano.getAvioes().size(); i++) {
+            Aviao aviao1 = plano.getAvioes().get(i);
+
+            for (int j = i + 1; j < plano.getAvioes().size(); j++) {
+                Aviao aviao2 = plano.getAvioes().get(j);
+
+                System.out.println(aviao1.getDescricao() + " " + aviao2.getDescricao() + " " +
+                        aviao1.getCoordenada().asCartesiana().distance(aviao2.getCoordenada()));
+
+            }
+        }
+
+
     }
 
     public void handleEscalonar(ActionEvent actionEvent) {
@@ -126,14 +147,14 @@ public class AppController {
 
     public void handleRotacionar(ActionEvent actionEvent) {
 
-        if (objetoSelecionado.get() == null) {
+        if (aviaoSelecionado.get() == null) {
             new Alert(Alert.AlertType.INFORMATION, "Selecione um objeto").show();
             return;
         }
 
         new AnguloDialog().showAndWait().ifPresent(angle -> {
-            Coordenada coordenada = objetoSelecionado.get().getCoordenada();
-            objetoSelecionado.get().setCoordenada(coordenada.rotate(angle));
+            Coordenada coordenada = aviaoSelecionado.get().getCoordenada();
+            aviaoSelecionado.get().setCoordenada(coordenada.rotate(angle));
         });
     }
 
@@ -157,13 +178,15 @@ public class AppController {
                 while (reader.hasNext()) {
 
                     switch (reader.nextName()) {
-                        case "pontos":
+                        case "avioes":
 
                             reader.beginArray();
 
                             while (reader.hasNext()) {
 
                                 reader.beginObject();
+
+                                Aviao aviao = new Aviao();
 
                                 double x = 0, y = 0;
 
@@ -175,12 +198,23 @@ public class AppController {
                                         case "y":
                                             y = reader.nextDouble();
                                             break;
+                                        case "descricao":
+                                            aviao.setDescricao(reader.nextString());
+                                            break;
+                                        case "direcao":
+                                            aviao.setDirecao(reader.nextDouble());
+                                            break;
+                                        case "velocidade":
+                                            aviao.setVelocidade(reader.nextDouble());
+                                            break;
                                         default:
                                             reader.skipValue();
                                     }
                                 }
 
-                                plano.add(new Ponto(CoordenadaCartesiana.of(x, y)));
+                                aviao.setCoordenada(CoordenadaCartesiana.of(x, y));
+
+                                plano.add(aviao);
 
                                 reader.endObject();
                             }
@@ -215,18 +249,23 @@ public class AppController {
             try (JsonWriter writer = new JsonWriter(new FileWriter(file))) {
                 writer.setIndent("  ");
                 writer.beginObject();
-                writer.name("pontos");
+                writer.name("avioes");
 
                 writer.beginArray();
 
-                for (Objeto objeto : plano.getObjetos()) {
+                for (Aviao aviao : plano.getAvioes()) {
 
                     writer.beginObject();
 
-                    CoordenadaCartesiana coordenada = objeto.getCoordenada().asCartesiana();
+                    CoordenadaCartesiana coordenada = aviao.getCoordenada().asCartesiana();
+
+                    writer.name("descricao").value(aviao.getDescricao());
 
                     writer.name("x").value(coordenada.getX());
                     writer.name("y").value(coordenada.getY());
+
+                    writer.name("direcao").value(aviao.getDirecao());
+                    writer.name("velocidade").value(aviao.getVelocidade());
 
                     writer.endObject();
                 }

@@ -24,13 +24,9 @@ import java.util.Optional;
 public abstract class Objeto extends VBox {
 
     private final BooleanProperty selecionado = new SimpleBooleanProperty();
-    private final ObjectProperty<Coordenada> coordenada;
-    private final StringProperty descricao;
+    private final ObjectProperty<Coordenada> coordenada = new SimpleObjectProperty<>();
 
-    public Objeto(Coordenada coordenada) {
-        this.coordenada = new SimpleObjectProperty<>(coordenada);
-        this.descricao = new SimpleStringProperty();
-
+    public Objeto() {
         setAlignment(Pos.TOP_CENTER);
 
         //this.plano = plano;
@@ -101,17 +97,5 @@ public abstract class Objeto extends VBox {
 
     public BooleanProperty selecionadoProperty() {
         return selecionado;
-    }
-
-    public String getDescricao() {
-        return descricao.get();
-    }
-
-    public StringProperty descricaoProperty() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao.set(descricao);
     }
 }

@@ -1,6 +1,5 @@
 package com.brunodunbar.plot;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -20,15 +19,14 @@ public class Plano extends GridPane {
 
     private double actionX, actionY;
 
-    private Objeto actionObjeto;
-    private Objeto objetoSelecionado;
+    private Aviao actionObjeto;
+    private Aviao objetoSelecionado;
 
     @FXML
     private Pane planoPane;
 
-    private ObservableList<Objeto> objetos = FXCollections.observableArrayList();
+    private ObservableList<Aviao> avioes = FXCollections.observableArrayList();
 
-    private final ContextMenu contextMenu;
     private final ContextMenu noContextMenu;
 
     public Plano() {
@@ -43,7 +41,7 @@ public class Plano extends GridPane {
             throw new RuntimeException(exception);
         }
 
-        objetos.addListener((ListChangeListener<Objeto>) c -> {
+        avioes.addListener((ListChangeListener<Aviao>) c -> {
             while (c.next()) {
                 if (c.wasRemoved()) {
                     planoPane.getChildren().removeAll(c.getRemoved());
@@ -54,19 +52,10 @@ public class Plano extends GridPane {
             }
         });
 
-        contextMenu = new ContextMenu();
-
-        MenuItem novoNo = new MenuItem("Novo ponto");
-        novoNo.setOnAction(e -> {
-            add(new Ponto(CoordenadaCartesiana.of(new Point2D( actionX, actionY), Plano.this)));
-        });
-
-        contextMenu.getItems().addAll(novoNo);
-
         noContextMenu = new ContextMenu();
 
         MenuItem removerPonto = new MenuItem("Remover ponto");
-        removerPonto.setOnAction(event -> objetos.remove(actionObjeto));
+        removerPonto.setOnAction(event -> avioes.remove(actionObjeto));
 
         noContextMenu.getItems().addAll(removerPonto);
 
@@ -74,13 +63,8 @@ public class Plano extends GridPane {
             if (event.getButton() == MouseButton.SECONDARY) {
                 actionX = event.getX();
                 actionY = event.getY();
-
-                contextMenu.show(Plano.this, event.getScreenX(), event.getScreenY());
-            } else {
-                contextMenu.hide();
             }
         });
-
 
         Line line1 = new Line();
         Line line2 = new Line();
@@ -153,20 +137,15 @@ public class Plano extends GridPane {
 //
 //    }
 
-    public void add(Objeto objeto) {
-//        Point2D point = coordenada.asCartesiana().toPoint(this);
-//
-//        objeto.setLayoutX(point.getX());
-//        objeto.setLayoutY(point.getY());
-
-        objetos.add(objeto);
+    public void add(Aviao aviao) {
+        avioes.add(aviao);
     }
 
-    public ObservableList<Objeto> getObjetos() {
-        return objetos;
+    public ObservableList<Aviao> getAvioes() {
+        return avioes;
     }
 
     public void clear() {
-        objetos.clear();
+        avioes.clear();
     }
 }

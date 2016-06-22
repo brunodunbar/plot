@@ -27,23 +27,21 @@
                         <MenuItem mnemonicParsing="false" text="Salvar..." onAction="#handleSalvar"/>
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Inserir">
+                <Menu mnemonicParsing="false" text="Avião">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Cartesiana" onAction="#handleInserirCartesiana"/>
-                        <MenuItem mnemonicParsing="false" text="Polar" onAction="#handleInserirPolar"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Ações">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Mover para" onAction="#handleMoverCartesiana"/>
+                        <MenuItem mnemonicParsing="false" text="Adicionar" onAction="#handleAddAviao"/>
+                        <MenuItem mnemonicParsing="false" text="Editar" onAction="#handleEditAviao"/>
+                        <SeparatorMenuItem/>
                         <MenuItem mnemonicParsing="false" text="Escalonar" onAction="#handleEscalonar"/>
                         <MenuItem mnemonicParsing="false" text="Rotacionar" onAction="#handleRotacionar"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem mnemonicParsing="false" text="Distancia aeroporto" onAction="#handleDistanciaAeroporto"/>
+                        <MenuItem mnemonicParsing="false" text="Distancia aviões" onAction="#handleDistanciaAvioes"/>
                     </items>
                 </Menu>
-
             </menus>
         </MenuBar>
         <TableView fx:id="objetosTable" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <Plano fx:id="plano" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Plano fx:id="plano" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.rowSpan="2"/>
     </children>
 </GridPane>

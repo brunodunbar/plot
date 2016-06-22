@@ -63,6 +63,21 @@ public class CoordenadaCartesiana extends Coordenada {
                 BigDecimal.valueOf(y.doubleValue() * Math.cos(radians) + x.doubleValue() * Math.sin(radians)));
     }
 
+    public double distance() {
+        return Math.sqrt(x.doubleValue() * x.doubleValue() + y.doubleValue() * y.doubleValue());
+    }
+
+    public double distance(Coordenada coordenada) {
+
+        CoordenadaCartesiana cartesiana = coordenada.asCartesiana();
+
+        double x = this.getX().doubleValue() - cartesiana.getX().doubleValue();
+        double y = this.getY().doubleValue() - cartesiana.getY().doubleValue();
+
+
+        return Math.sqrt(x * x + y * y);
+    }
+
     @Override
     public CoordenadaCartesiana asCartesiana() {
         return this;
