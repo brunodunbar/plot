@@ -38,6 +38,7 @@
                         <MenuItem mnemonicParsing="false" text="Distancia aeroporto"
                                   onAction="#handleDistanciaAeroporto"/>
                         <MenuItem mnemonicParsing="false" text="Distancia aviões" onAction="#handleDistanciaAvioes"/>
+                        <MenuItem mnemonicParsing="false" text="Colisão" onAction="#handleColisaoAvioes"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Calculo">

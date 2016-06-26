@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 public class CoordenadaCartesiana extends Coordenada {
 
     public static final CoordenadaCartesiana ZERO = new CoordenadaCartesiana(BigDecimal.ZERO, BigDecimal.ZERO);
+    public static final CoordenadaCartesiana INVALID = new CoordenadaCartesiana(BigDecimal.valueOf(Double.MIN_VALUE), BigDecimal.valueOf(Double.MIN_VALUE));
+
 
     private final BigDecimal x;
     private final BigDecimal y;
@@ -23,6 +25,10 @@ public class CoordenadaCartesiana extends Coordenada {
 
     public static CoordenadaCartesiana of(double x, double y) {
         return new CoordenadaCartesiana(new BigDecimal(x), new BigDecimal(y));
+    }
+
+    public static CoordenadaCartesiana of(BigDecimal x, BigDecimal y) {
+        return new CoordenadaCartesiana(x, y);
     }
 
     public static CoordenadaCartesiana of(String x, String y) {
@@ -67,15 +73,24 @@ public class CoordenadaCartesiana extends Coordenada {
         return Math.sqrt(x.doubleValue() * x.doubleValue() + y.doubleValue() * y.doubleValue());
     }
 
-    public double distance(Coordenada coordenada) {
+    public BigDecimal distance(Coordenada coordenada) {
 
         CoordenadaCartesiana cartesiana = coordenada.asCartesiana();
 
-        double x = this.getX().doubleValue() - cartesiana.getX().doubleValue();
-        double y = this.getY().doubleValue() - cartesiana.getY().doubleValue();
+        BigDecimal x = getX().subtract(cartesiana.getX());
+        BigDecimal y = getY().subtract(cartesiana.getY());
 
 
-        return Math.sqrt(x * x + y * y);
+        return BigDecimal.valueOf(Math.sqrt(x.multiply(x).add(y.multiply(y)).doubleValue())).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+
+    public BigDecimal getCoeficienteLinear(BigDecimal coeficienteAngular) {
+        return y.subtract(coeficienteAngular.multiply(x)).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public BigDecimal getCoeficienteAngular(double angle) {
+        return BigDecimal.valueOf(Math.tan(Math.toRadians(angle))).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     @Override

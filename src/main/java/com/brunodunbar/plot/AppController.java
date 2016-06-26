@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class AppController {
@@ -91,17 +92,53 @@ public class AppController {
 
     public void handleDistanciaAvioes(ActionEvent actionEvent) {
 
+        StringBuilder stringBuilder = new StringBuilder();
+
         for (int i = 0; i < plano.getAvioes().size(); i++) {
             Aviao aviao1 = plano.getAvioes().get(i);
+            for (int j = i + 1; j < plano.getAvioes().size(); j++) {
+                Aviao aviao2 = plano.getAvioes().get(j);
+                stringBuilder.append(aviao1.getDescricao() + "->" + aviao2.getDescricao() + " " +
+                        aviao1.getCoordenada().asCartesiana().distance(aviao2.getCoordenada()) + "\n");
+            }
+        }
 
+        new ResultadoDialog(stringBuilder.toString()).showAndWait();
+    }
+
+
+    public void handleColisaoAvioes(ActionEvent actionEvent) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < plano.getAvioes().size(); i++) {
+            Aviao aviao1 = plano.getAvioes().get(i);
             for (int j = i + 1; j < plano.getAvioes().size(); j++) {
                 Aviao aviao2 = plano.getAvioes().get(j);
 
-                System.out.println(aviao1.getDescricao() + " " + aviao2.getDescricao() + " " +
-                        aviao1.getCoordenada().asCartesiana().distance(aviao2.getCoordenada()));
+                stringBuilder.append(aviao1.getDescricao()).append("->").append(aviao2.getDescricao()).append(" ");
 
+                CoordenadaCartesiana coordenadaColisao = aviao1.getCoordenadaColisao(aviao2);
+                BigDecimal intervaloColisao = aviao1.getIntervaloColisao(aviao2);
+
+                if (CoordenadaCartesiana.INVALID.equals(coordenadaColisao)) {
+                    stringBuilder.append("Sem risco de colisão\n");
+                    continue;
+                }
+
+                stringBuilder.append(coordenadaColisao).append(" Intervalo ").append(intervaloColisao).append(" ");
+
+                if (intervaloColisao.doubleValue() < 0.02) {
+                    stringBuilder.append("Colisão");
+                } else {
+                    stringBuilder.append("Sem colisão");
+                }
+
+                stringBuilder.append("\n");
             }
         }
+
+        new ResultadoDialog(stringBuilder.toString()).showAndWait();
 
 
     }
