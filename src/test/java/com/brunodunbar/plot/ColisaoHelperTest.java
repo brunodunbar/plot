@@ -8,22 +8,20 @@ import static org.junit.Assert.*;
 
 public class ColisaoHelperTest {
 
-    @Test
-    public void deveRetornarACoordenadaColisaoInvalida() {
-        //angulos opostos
+    @Test(expected = DirecaoOpostasException.class)
+    public void deveDirecaoOpostas() throws DirecaoOpostasException, MesmaDirecaoException {
         assertEquals(CoordenadaCartesiana.INVALID,  ColisaoHelper.getCoordenadaColisao(CoordenadaCartesiana.of(5, 5),
                 45, CoordenadaCartesiana.of(5, 10), 225));
+    }
 
-        //angulos q tendem ao infinito
+    @Test(expected = MesmaDirecaoException.class)
+    public void deveMesmaDirecao() throws DirecaoOpostasException, MesmaDirecaoException {
         assertEquals(CoordenadaCartesiana.INVALID, ColisaoHelper.getCoordenadaColisao(CoordenadaCartesiana.of(5, 5),
                 90, CoordenadaCartesiana.of(5, 10), 90));
-
-        assertEquals(CoordenadaCartesiana.INVALID, ColisaoHelper.getCoordenadaColisao(CoordenadaCartesiana.of(5, 5),
-                90, CoordenadaCartesiana.of(5, 10), 345));
     }
 
     @Test
-    public void deveRetornarACoordenadaColisao() {
+    public void deveRetornarACoordenadaColisao() throws DirecaoOpostasException, MesmaDirecaoException {
         CoordenadaCartesiana coordenadaColisao = ColisaoHelper.getCoordenadaColisao(CoordenadaCartesiana.of(5, 5),
                 45, CoordenadaCartesiana.of(5, 10), 135);
 
@@ -32,7 +30,7 @@ public class ColisaoHelperTest {
     }
 
     @Test
-    public void deveRetornarADistanciaColisao() {
+    public void deveRetornarADistanciaColisao() throws DirecaoOpostasException, MesmaDirecaoException {
         CoordenadaCartesiana coordenada1 = CoordenadaCartesiana.of(5, 5);
         CoordenadaCartesiana coordenada2 = CoordenadaCartesiana.of(5, 10);
         CoordenadaCartesiana coordenadaColisao = ColisaoHelper.getCoordenadaColisao(coordenada1,

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class CoordenadaCartesiana extends Coordenada {
 
     public static final CoordenadaCartesiana ZERO = new CoordenadaCartesiana(BigDecimal.ZERO, BigDecimal.ZERO);
-    public static final CoordenadaCartesiana INVALID = new CoordenadaCartesiana(BigDecimal.valueOf(Double.MIN_VALUE), BigDecimal.valueOf(Double.MIN_VALUE));
+    public static final CoordenadaCartesiana INVALID = new CoordenadaCartesiana(BigDecimal.valueOf(Double.MAX_VALUE), BigDecimal.valueOf(Double.MAX_VALUE));
 
 
     private final BigDecimal x;
@@ -80,17 +80,33 @@ public class CoordenadaCartesiana extends Coordenada {
         BigDecimal x = getX().subtract(cartesiana.getX());
         BigDecimal y = getY().subtract(cartesiana.getY());
 
+        double sqrt = Math.sqrt(x.multiply(x).add(y.multiply(y)).doubleValue());
 
-        return BigDecimal.valueOf(Math.sqrt(x.multiply(x).add(y.multiply(y)).doubleValue())).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        if(sqrt == Double.NaN) {
+//            return
+//        }
+
+        return BigDecimal.valueOf(sqrt).setScale(Constants.PRESISION, BigDecimal.ROUND_HALF_UP);
     }
 
 
     public BigDecimal getCoeficienteLinear(BigDecimal coeficienteAngular) {
-        return y.subtract(coeficienteAngular.multiply(x)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return y.subtract(coeficienteAngular.multiply(x)).setScale(Constants.PRESISION, BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal getCoeficienteAngular(double angle) {
-        return BigDecimal.valueOf(Math.tan(Math.toRadians(angle))).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return BigDecimal.valueOf(Math.tan(Math.toRadians(angle))).setScale(Constants.PRESISION, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public double getAngle(Coordenada target) {
+        CoordenadaCartesiana cartesiana = target.asCartesiana();
+        float angle = (float) Math.toDegrees(Math.atan2(cartesiana.getY().doubleValue() - getY().doubleValue(), cartesiana.getX().doubleValue() - getX().doubleValue()));
+
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        return angle;
     }
 
     @Override

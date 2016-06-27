@@ -23,24 +23,24 @@ public class Aviao extends Objeto {
         getChildren().add(imageView);
 
         direcao.addListener(observable -> {
-            imageView.setRotate(direcao.doubleValue());
+            imageView.setRotate(360 - direcao.doubleValue());
         });
 
         getStyleClass().add("aviao");
     }
 
-    public BigDecimal getIntervaloColisao(Aviao aviao) {
-        CoordenadaCartesiana coordenadaColisao = getCoordenadaColisao(aviao);
+//    public BigDecimal getIntervaloColisao(Aviao aviao) {
+//        CoordenadaCartesiana coordenadaColisao = getCoordenadaColisao(aviao);
+//
+//        BigDecimal tempo1 = ColisaoHelper.getTempoColisao(coordenadaColisao.distance(getCoordenada()), getVelocidade());
+//        BigDecimal tempo2 = ColisaoHelper.getTempoColisao(coordenadaColisao.distance(aviao.getCoordenada()), aviao.getVelocidade());
+//
+//        return tempo1.subtract(tempo2).abs();
+//    }
 
-        BigDecimal tempo1 = ColisaoHelper.getTempoColisao(coordenadaColisao.distance(getCoordenada()), getVelocidade());
-        BigDecimal tempo2 = ColisaoHelper.getTempoColisao(coordenadaColisao.distance(aviao.getCoordenada()), aviao.getVelocidade());
-
-        return tempo1.subtract(tempo2).abs();
-    }
-
-    public CoordenadaCartesiana getCoordenadaColisao(Aviao aviao) {
-        return ColisaoHelper.getCoordenadaColisao(getCoordenada(), getDirecao(), aviao.getCoordenada(), aviao.getDirecao());
-    }
+//    public CoordenadaCartesiana getCoordenadaColisao(Aviao aviao) {
+//        return ColisaoHelper.getCoordenadaColisao(getCoordenada(), getDirecao(), aviao.getCoordenada(), aviao.getDirecao());
+//    }
 
     private double getCoeficienteLinear() {
         double angular = getCoeficienteAngular();

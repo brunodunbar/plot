@@ -17,17 +17,10 @@ import java.io.IOException;
 
 public class Plano extends GridPane {
 
-    private double actionX, actionY;
-
-    private Aviao actionObjeto;
-    private Aviao objetoSelecionado;
-
     @FXML
     private Pane planoPane;
 
     private ObservableList<Aviao> avioes = FXCollections.observableArrayList();
-
-    private final ContextMenu noContextMenu;
 
     public Plano() {
 
@@ -49,20 +42,6 @@ public class Plano extends GridPane {
                 if (c.wasAdded()) {
                     planoPane.getChildren().addAll(c.getAddedSubList());
                 }
-            }
-        });
-
-        noContextMenu = new ContextMenu();
-
-        MenuItem removerPonto = new MenuItem("Remover ponto");
-        removerPonto.setOnAction(event -> avioes.remove(actionObjeto));
-
-        noContextMenu.getItems().addAll(removerPonto);
-
-        planoPane.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                actionX = event.getX();
-                actionY = event.getY();
             }
         });
 
@@ -88,54 +67,6 @@ public class Plano extends GridPane {
 
         planoPane.getChildren().addAll(line1, line2);
     }
-
-//
-//    public void addPontoPolar(Double angulo, Double raio) {
-//        addPontoCartesiana(raio * Math.cos(Math.toRadians(angulo)), raio * Math.sin(Math.toRadians(angulo)));
-//    }
-
-//
-//    public void moverPontoCartesiana(Double x, Double y) {
-//
-//        Point2D translate = translate(x, y);
-//
-//        if (objetoSelecionado != null) {
-//            objetoSelecionado.setLayoutX(translate.getX() - objetoSelecionado.getOffsetX());
-//            objetoSelecionado.setLayoutY(translate.getY() - objetoSelecionado.getOffsetY());
-//        }
-//    }
-
-//    public void escalonarPonto(Double percX, Double percY) {
-//
-//        if (objetoSelecionado != null) {
-//
-//            Point2D position = objetoSelecionado.getPosition();
-//
-//            Point2D translate = translate(position.getX() * percX / 100, position.getY() * percY / 100);
-//
-//            objetoSelecionado.setLayoutX(translate.getX() - objetoSelecionado.getOffsetX());
-//            objetoSelecionado.setLayoutY(translate.getY() - objetoSelecionado.getOffsetY());
-//        }
-//    }
-
-//    public void rotacionarPonto(Double angulo) {
-//
-//        if (objetoSelecionado != null) {
-//
-//
-//            Point2D position = objetoSelecionado.getPosition();
-//
-//            double radians = Math.toRadians(angulo);
-//
-//            Point2D translate = translate(position.getX() * Math.cos(radians) - position.getY() * Math.sin(radians),
-//                    position.getY() * Math.cos(radians) + position.getX() * Math.sin(radians));
-//
-//            objetoSelecionado.setLayoutX(translate.getX() - objetoSelecionado.getOffsetX());
-//            objetoSelecionado.setLayoutY(translate.getY() - objetoSelecionado.getOffsetY());
-//        }
-//
-//
-//    }
 
     public void add(Aviao aviao) {
         avioes.add(aviao);

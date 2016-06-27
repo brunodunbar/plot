@@ -85,25 +85,46 @@ public class AppController {
 
 
     public void handleDistanciaAeroporto(ActionEvent actionEvent) {
+
+        StringBuilder builder = new StringBuilder();
+
         for (Aviao aviao : plano.getAvioes()) {
-            System.out.println("Avião: " + aviao.getDescricao() + " " + aviao.getCoordenada().asCartesiana().distance());
+            double distance = aviao.getCoordenada().asCartesiana().distance();
+
+            builder.append("Avião: ").append(aviao.getDescricao()).append(" ").append(distance).append(" ");
+
+            if(distance < configuracao.getDistanciaMinAeroporto()) {
+                builder.append(" próximo do aeroporto");
+            }
+
+            builder.append("\n");
         }
+
+        new ResultadoDialog(builder.toString()).showAndWait();
     }
 
     public void handleDistanciaAvioes(ActionEvent actionEvent) {
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < plano.getAvioes().size(); i++) {
             Aviao aviao1 = plano.getAvioes().get(i);
             for (int j = i + 1; j < plano.getAvioes().size(); j++) {
                 Aviao aviao2 = plano.getAvioes().get(j);
-                stringBuilder.append(aviao1.getDescricao() + "->" + aviao2.getDescricao() + " " +
-                        aviao1.getCoordenada().asCartesiana().distance(aviao2.getCoordenada()) + "\n");
+
+                BigDecimal distance = aviao1.getCoordenada().asCartesiana().distance(aviao2.getCoordenada());
+                builder.append(aviao1.getDescricao()).append("->")
+                        .append(aviao2.getDescricao()).append(" ").append(distance);
+
+                if(distance.doubleValue() <= configuracao.getDistanciaMinAvioes()) {
+                    builder.append(" não estão reipeitando a distancia mínima");
+                }
+
+                builder.append("\n");
             }
         }
 
-        new ResultadoDialog(stringBuilder.toString()).showAndWait();
+        new ResultadoDialog(builder.toString()).showAndWait();
     }
 
 
@@ -118,22 +139,13 @@ public class AppController {
 
                 stringBuilder.append(aviao1.getDescricao()).append("->").append(aviao2.getDescricao()).append(" ");
 
-                CoordenadaCartesiana coordenadaColisao = aviao1.getCoordenadaColisao(aviao2);
-                BigDecimal intervaloColisao = aviao1.getIntervaloColisao(aviao2);
+                ColisaoHelper.ColisaoResult result = ColisaoHelper.getColisao(aviao1, aviao2, configuracao.getIntervaloMin());
 
-                if (CoordenadaCartesiana.INVALID.equals(coordenadaColisao)) {
-                    stringBuilder.append("Sem risco de colisão\n");
-                    continue;
+                if (result.hasPontoColisao()) {
+                    stringBuilder.append(result.getCoordenada()).append(" ");
                 }
 
-                stringBuilder.append(coordenadaColisao).append(" Intervalo ").append(intervaloColisao).append(" ");
-
-                if (intervaloColisao.doubleValue() < 0.02) {
-                    stringBuilder.append("Colisão");
-                } else {
-                    stringBuilder.append("Sem colisão");
-                }
-
+                stringBuilder.append(result.getMensagem());
                 stringBuilder.append("\n");
             }
         }

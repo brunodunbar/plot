@@ -1,49 +1,26 @@
 package com.brunodunbar.plot;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.*;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Optional;
 
 public abstract class Objeto extends VBox {
+
+    private static final Logger LOGGER = LogManager.getLogger(Objeto.class);
 
     private final BooleanProperty selecionado = new SimpleBooleanProperty();
     private final ObjectProperty<Coordenada> coordenada = new SimpleObjectProperty<>();
 
     public Objeto() {
         setAlignment(Pos.TOP_CENTER);
-
-        //this.plano = plano;
-
-//        InvalidationListener updateLabel = observable1 -> {
-//
-//            Point2D translate = plano.translate(this);
-//
-//            BigDecimal x = BigDecimal.valueOf(translate.getX()).setScale(2, BigDecimal.ROUND_DOWN);
-//            BigDecimal y = BigDecimal.valueOf(translate.getY()).setScale(2, BigDecimal.ROUND_DOWN);
-//
-//            position = new Point2D(x.doubleValue(), y.doubleValue());
-//
-//        };
-
-        //  layoutXProperty().addListener(updateLabel);
-        //  layoutYProperty().addListener(updateLabel);
 
         this.coordenada.addListener(observable -> updatePosition());
         this.parentProperty().addListener(observable -> updatePosition());
@@ -63,11 +40,9 @@ public abstract class Objeto extends VBox {
         Optional.ofNullable(getParent()).ifPresent(parent -> {
             Point2D point = getCoordenada().asCartesiana().toPoint(parent);
 
-            //Bounds boundsInParent = getBoundsInParent();
-
-            System.out.println("---- Parent bounds: " + parent.getLayoutBounds());
-            System.out.println("---- Width: " + getWidth() + ", Height: " + getHeight());
-            System.out.println("---- Point: " + point);
+            LOGGER.debug("Parent bounds: " + parent.getLayoutBounds());
+            LOGGER.debug("Width: " + getWidth() + ", Height: " + getHeight());
+            LOGGER.debug("Point: " + point);
 
             setLayoutX(point.getX() - getWidth() / 2);
             setLayoutY(point.getY() - getHeight() / 2);
